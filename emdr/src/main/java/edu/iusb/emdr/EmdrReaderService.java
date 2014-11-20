@@ -8,14 +8,26 @@ import org.json.simple.parser.JSONParser;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 
+/**
+ * The relay reader service. Connects to the relay's message queue and hands off the market object
+ * to an <code>ExecutorService</code> persister to write it to the database.
+ */
 public class EmdrReaderService {
 
 	private final ExecutorService executor;
 
+	/**
+	 * Executor provided constructor
+	 * @param executor
+	 */
 	public EmdrReaderService(ExecutorService executor) {
 		this.executor = executor;
 	}
 
+	/**
+	 * Reads from the relay message queue.
+	 * @throws Exception
+	 */
 	public void read() throws Exception {
 		ZMQ.Context context = ZMQ.context(1);
 		ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
@@ -37,7 +49,13 @@ public class EmdrReaderService {
 		}
 	}
 
-	public JSONObject getMarketData(ZMQ.Socket subscriber) throws Exception {
+	/**
+	 * Receives message from subscriber and returns parsed json object. 
+	 * @param subscriber
+	 * @return parsed json object
+	 * @throws Exception
+	 */
+	protected JSONObject getMarketData(ZMQ.Socket subscriber) throws Exception {
 		// Receive compressed raw market data.
 		byte[] receivedData = subscriber.recv(0);
 
@@ -64,7 +82,7 @@ public class EmdrReaderService {
 
 	}
 
-	private void execute(JSONObject marketData) {
+	protected void execute(JSONObject marketData) {
 		// you know, do more fun things here.
 		RelayItemPersisterTask task = new RelayItemPersisterTask(marketData);
 		executor.execute(task);

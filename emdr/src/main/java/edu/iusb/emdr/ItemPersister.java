@@ -3,22 +3,31 @@ package edu.iusb.emdr;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
 
 import org.json.simple.JSONObject;
 
+/**
+ * Persists market data json objects to the database.
+ */
 public class ItemPersister {
 	private Connection conn = null;
 	private PreparedStatement ps = null;
 
 	private final JSONObject marketData;
 
+	/**
+	 * Market data constructor.
+	 * @param marketData market data object to persist
+	 */
 	public ItemPersister(JSONObject marketData) {
 		this.marketData = marketData;
 	}
 
 	// TODO: switch to connection pool
+	/**
+	 * Saves the object to the database.
+	 * @throws Exception
+	 */
 	public void persist() throws Exception {
 		Class.forName("com.mysql.jdbc.Driver");
 		conn = DriverManager.getConnection("jdbc:mysql://localhost/emdr?"
